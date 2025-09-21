@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinecraftShop - Pago con Muni Dinero</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #8BC34A;
+            --dark: #2E7D32;
+            --light: #C8E6C9;
+            --accent: #FF9800;
+            --text: #212121;
+            --background: #F1F8E9;
+            --muni: #9C27B0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%234CAF50" width="50" height="50"/><rect fill="%238BC34A" x="50" width="50" height="50"/><rect fill="%238BC34A" y="50" width="50" height="50"/><rect fill="%234CAF50" x="50" y="50" width="50" height="50"/></svg>');
+            background-size: 20px;
+            opacity: 0.9;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path fill="%23FFFFFF" opacity="0.1" d="M0 0h20v20H0zM20 20h20v20H20z"/></svg>');
+            background-size: 40px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent);
+            transform: rotate(45deg);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        nav {
+            background-color: var(--dark);
+            padding: 0.5rem;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav a:hover {
+            background-color: var(--primary);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .hero {
+            background: linear-gradient(to right, rgba(76, 175, 80, 0.8), rgba(139, 195, 74, 0.8));
+            padding: 3rem;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .product {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .product-image {
+            height: 180px;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-info h3 {
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .product-info p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark);
+        }
+        
+        .btn-muni {
+            background-color: var(--muni);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-muni:hover {
+            background-color: #7B1FA2;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent);
+        }
+        
+        .btn-accent:hover {
+            background-color: #F57C00;
+        }
+        
+        .cart {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .cart h2 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .payment-methods {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .payment-methods h2 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+        }
+        
+        .muni-info {
+            background-color: #F3E5F5;
+            border-left: 4px solid var(--muni);
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .muni-info h3 {
+            color: var(--muni);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .muni-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .muni-step {
+            background-color: #EDE7F6;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .muni-step .number {
+            background-color: var(--muni);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .muni-contact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .contact-method {
+            flex: 1;
+            min-width: 250px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .contact-method i {
+            font-size: 2rem;
+            color: var(--muni);
+            margin-bottom: 1rem;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .upload-section h2 {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-steps {
+            text-align: left;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .upload-step {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #F1F8E9;
+            border-radius: 8px;
+        }
+        
+        .upload-step h3 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        footer {
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .products {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .hero {
+                padding: 2rem 1rem;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .muni-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .muni-contact {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <h1>MinecraftShop</h1>
+        </div>
+        <p>Todos los artículos a solo 1€ - Pago con Muni Dinero</p>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#">Inicio</a></li>
+            <li><a href="#">Productos</a></li>
+            <li><a href="#">Cómo Pagar</a></li>
+            <li><a href="#">Contacto</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <div class="hero">
+            <h2>¡Tienda Minecraft con Pago Muni Dinero!</h2>
+            <p>Tu página web está lista para ser subida a internet y comenzar a vender.</p>
+        </div>
+        
+        <div class="upload-section">
+            <h2><i class="fas fa-cloud-upload-alt"></i> Sube tu página web</h2>
+            
+            <div class="upload-steps">
+                <div class="upload-step">
+                    <h3><i class="fas fa-save"></i> Paso 1: Guarda el archivo</h3>
+                    <p>Guarda esta página como <strong>index.html</strong> en tu computadora.</p>
+                </div>
+                
+                <div class="upload-step">
+                    <h3><i class="fas fa-server"></i> Paso 2: Elige un hosting</h3>
+                    <p>Registrate en un servicio de hosting gratuito como:
+                        <br>- GitHub Pages (recomendado)
+                        <br>- Netlify
+                        <br>- Vercel
+                        <br>- 000webhost
+                    </p>
+                </div>
+                
+                <div class="upload-step">
+                    <h3><i class="fas fa-upload"></i> Paso 3: Sube el archivo</h3>
+                    <p>Sube el archivo index.html a tu servicio de hosting mediante FTP o la interfaz web.</p>
+                </div>
+                
+                <div class="upload-step">
+                    <h3><i class="fas fa-globe"></i> Paso 4: Accede a tu web</h3>
+                    <p>Una vez subido, tu tienda estará disponible en la URL proporcionada por el servicio de hosting.</p>
+                </div>
+            </div>
+            
+            <div class="muni-info">
+                <h3><i class="fas fa-info-circle"></i> Información importante</h3>
+                <p>Tu página incluye: diseño responsive, carrito de compras funcional, instrucciones de pago con Muni Dinero (+240 555 202 073) y métodos de confirmación.</p>
+            </div>
+        </div>
+        
+        <div class="payment-methods">
+            <h2>Pago con Muni Dinero</h2>
+            
+            <div class="muni-info">
+                <h3><i class="fas fa-info-circle"></i> Cómo pagar con Muni Dinero</h3>
+                <p>Realiza el pago directamente a nuestro número de Muni Dinero. Una vez confirmado el pago, recibirás tus artículos de Minecraft en menos de 24 horas.</p>
+            </div>
+            
+            <div class="muni-steps">
+                <div class="muni-step">
+                    <div class="number">1</div>
+                    <h4>Agrega productos al carrito</h4>
+                    <p>Selecciona los artículos de Minecraft que deseas comprar.</p>
+                </div>
+                
+                <div class="muni-step">
+                    <div class="number">2</div>
+                    <h4>Procede al pago</h4>
+                    <p>Haz clic en "Pagar con Muni Dinero" para ver los detalles de transferencia.</p>
+                </div>
+                
+                <div class="muni-step">
+                    <div class="number">3</div>
+                    <h4>Realiza la transferencia</h4>
+                    <p>Transfiere el monto exacto a nuestro número Muni Dinero.</p>
+                </div>
+                
+                <div class="muni-step">
+                    <div class="number">4</div>
+                    <h4>Confirma tu pago</h4>
+                    <p>Envíanos el comprobante por WhatsApp o email.</p>
+                </div>
+            </div>
+            
+            <div class="muni-info">
+                <h3><i class="fas fa-university"></i> Datos para la transferencia</h3>
+                <p><strong>Nombre del titular:</strong> MinecraftShop</p>
+                <p><strong>Número de Muni Dinero:</strong> +240 555 202 073</p>
+                <p><strong>Transferencia directa:</strong> Envía el monto exacto de tu compra a este número</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 MinecraftShop - Todos los artículos a 1€</p>
+        <p>Pagos seguros mediante Muni Dinero: +240 555 202 073</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simular funcionalidad del carrito
+            const payButton = document.querySelector('.btn-muni');
+            
+            if (payButton) {
+                payButton.addEventListener('click', function() {
+                    alert('¡Gracias por tu compra!\n\nPor favor, transfiere el monto total a nuestro Muni Dinero: +240 555 202 073\n\nUna vez realizado el pago, envía el comprobante por WhatsApp para activar tu pedido.');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
